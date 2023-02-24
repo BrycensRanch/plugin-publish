@@ -1,8 +1,7 @@
 # Publish Minecraft Plugins & Mods - GitHub Action
 
-> This action is a fork [mod-publish](https://github.com/Kir-Antipov/mc-publish) we never plan to merge back into upstream as it was conisdered out of scope for their project.
-
-> Also, the plugin functionality is currently not implemented yet. Also, as we use mc-plugin as a upstream, we will continue to support mods along as it's convenient.
+> This action is a fork [mod-publish](https://github.com/Kir-Antipov/mc-publish), which should use more radical methods of uploading plugins automatically, with the use of [puppeteer](https://pptr.dev) when necessary to upload your plugins to their specified place. However, we do not plan on merging back into upstream due to the nature of our changes - which are opinionated.
+> However, the plugin functionality is currently not implemented yet. Also, as we use mc-plugin as a upstream, we will continue to support mods along as it's convenient.
 
 [![GitHub tag](https://img.shields.io/github/tag/Kir-Antipov/mc-publish.svg?cacheSeconds=3600)](https://github.com/BrycensRanch/plugin-publish/releases/latest)
 [![GitHub build status](https://img.shields.io/github/actions/workflow/status/BrycensRanch/plugin-publish/ci.yml?branch=master)](https://github.com/BrycensRanch/plugin-publish/actions/workflows/ci.yml)
@@ -12,6 +11,7 @@
 This action helps you upload assets of your Minecraft mods & plugins to GitHub Releases, Modrinth, CurseForge, Polymart, MCM, and hopefully Hangar soon. This is a fork of mc-publish, with it losing it's cross platform functionality and adding the ability to automatically publish plugins to their respective platorms and it converts your Markdown to BBCode when necessary.
 
 Some plugin platforms do not have functionatlity to upload assets/updates to their platform. So, we act like a regular user and upload it ourselves.
+Websites don't like robots, so, we'll sometimes have to use captcha services such as [2captcha](https://2captcha.com), [Captcha AI](https://captchaai.com), [TrueCaptcha](https://truecaptcha.org)
 
 ### 📖 Usage
 
