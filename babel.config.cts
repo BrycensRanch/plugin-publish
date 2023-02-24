@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('@babel/core').ConfigFunction} */
+const babelConfig =  {
     // plugins: [
     //     "@babel/plugin-transform-async-to-generator"
     // ],
@@ -7,3 +8,4 @@ module.exports = {
         "@babel/preset-typescript",
     ]
 };
+module.exports = babelConfig;
