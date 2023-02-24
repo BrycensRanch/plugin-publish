@@ -1,14 +1,11 @@
 # Publish Minecraft Plugins & Mods - GitHub Action
 
 > This action is a fork [mod-publish](https://github.com/Kir-Antipov/mc-publish) we never plan to merge back into upstream as it was conisdered out of scope for their project.
-[![GitHub tag](https://img.shields.io/github/tag/Kir-Antipov/mc-publish.svg?cacheSeconds=3600)](https://github.com/Kir-Antipov/mc-publish/releases/latest)
-[![GitHub build status](https://img.shields.io/github/actions/workflow/status/Kir-Antipov/mc-publish/ci.yml?branch=master)](https://github.com/Kir-Antipov/mc-publish/actions/workflows/ci.yml)
-[![GitHub license](https://img.shields.io/github/license/Kir-Antipov/mc-publish.svg?cacheSeconds=36000)](https://github.com/Kir-Antipov/mc-publish#readme)
 
 > Also, the plugin functionality is currently not implemented yet. Also, as we use mc-plugin as a upstream, we will continue to support mods along as it's convenient.
 
-[![GitHub tag](https://img.shields.io/github/tag/BrycensRanch/plugin-publish.svg?cacheSeconds=3600)](https://github.com/BrycensRanch/plugin-publish/releases/latest)
-[![GitHub build status](https://img.shields.io/github/workflow/status/BrycensRanch/plugin-publish/ci/master?cacheSeconds=3600)](https://github.com/BrycensRanch/plugin-publish/actions/workflows/ci.yml)
+[![GitHub tag](https://img.shields.io/github/tag/Kir-Antipov/mc-publish.svg?cacheSeconds=3600)](https://github.com/BrycensRanch/plugin-publish/releases/latest)
+[![GitHub build status](https://img.shields.io/github/actions/workflow/status/BrycensRanch/plugin-publish/ci.yml?branch=master)](https://github.com/BrycensRanch/plugin-publish/actions/workflows/ci.yml)
 [![GitHub license](https://img.shields.io/github/license/BrycensRanch/plugin-publish.svg?cacheSeconds=36000)](https://github.com/BrycensRanch/plugin-publish#readme)
 [![CodeCov](https://codecov.io/gh/BrycensRanch/plugin-publish/branch/master/graph/badge.svg?token=gBszno95Jm)](https://codecov.io/gh/BrycensRanch/plugin-publish)
 
