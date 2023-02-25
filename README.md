@@ -8,7 +8,9 @@
 [![GitHub license](https://img.shields.io/github/license/BrycensRanch/plugin-publish.svg?cacheSeconds=36000)](https://github.com/BrycensRanch/plugin-publish#readme)
 [![CodeCov](https://codecov.io/gh/BrycensRanch/plugin-publish/branch/master/graph/badge.svg?token=gBszno95Jm)](https://codecov.io/gh/BrycensRanch/plugin-publish)
 
-This action helps you upload assets of your Minecraft mods & plugins to GitHub Releases, Modrinth, CurseForge, Polymart, MCM, and hopefully Hangar soon. This is a fork of mc-publish, with it losing it's cross platform functionality and adding the ability to automatically publish plugins to their respective platorms and it converts your Markdown to BBCode when necessary. (Spigot support is not planned due to scraping or automations being a violation of their stupid tos)
+This action helps you upload assets of your Minecraft mods & plugins to GitHub Releases, Modrinth, CurseForge, Polymart, and hopefully Hangar soon. This is a fork of mc-publish, with it losing it's cross platform functionality and adding the ability to automatically publish plugins to their respective platorms and it converts your Markdown to BBCode when necessary. (Spigot & MCM support is not planned due to scraping or automations being a violation of their stupid tos and their REST APIs don't support it)
+
+Keep in mind, I couldn't find any example of uploading a resource update to MCM when I looked through the source code of their various API wrappers, so. 
 
 Some plugin platforms do not have functionatlity to upload assets/updates to their platform. So, we act like a regular user and upload it ourselves.
 Websites don't like robots, so, we'll sometimes have to use captcha services such as [2captcha](https://2captcha.com), [Captcha AI](https://captchaai.com), [TrueCaptcha](https://truecaptcha.org)
