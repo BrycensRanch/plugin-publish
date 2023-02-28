@@ -21,7 +21,7 @@ export default class PolymartPublisher extends PluginPublisher {
         // @ts-expect-error
         data.beta = channel === "beta" ? "1" : "0";
         // @ts-expect-error
-        data.snapshot = channel === "snapshot" ? "1" : "0";
+        data.snapshot = channel === "alpha" ? "1" : "0";
         await createVersion(id, data, files, token);
         stopwatch.stop();
     }
