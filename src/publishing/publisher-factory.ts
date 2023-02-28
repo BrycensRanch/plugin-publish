@@ -4,6 +4,7 @@ import GitHubPublisher from "./github/github-publisher";
 import ModrinthPublisher from "./modrinth/modrinth-publisher";
 import CurseForgePublisher from "./curseforge/curseforge-publisher";
 import Logger from "../utils/logging/logger";
+import PolymartPublisher from "./polymart/polymart-publisher";
 
 export default class PublisherFactory {
     public create(target: PublisherTarget, logger?: Logger): Publisher<unknown> {
@@ -16,6 +17,10 @@ export default class PublisherFactory {
 
             case PublisherTarget.CurseForge:
                 return new CurseForgePublisher(logger);
+            case PublisherTarget.Polymart:
+                return new PolymartPublisher(logger);
+            // case PublisherTarget.Hangar:
+            //     return new CurseForgePublisher(logger);
 
             default:
                 throw new Error(`Unknown target "${PublisherTarget.toString(target)}"`);

@@ -27280,7 +27280,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 55:
+/***/ 664:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __nccwpck_require__) => {
 
 
@@ -27358,6 +27358,8 @@ var PublisherTarget;
     PublisherTarget[PublisherTarget["CurseForge"] = 0] = "CurseForge";
     PublisherTarget[PublisherTarget["Modrinth"] = 1] = "Modrinth";
     PublisherTarget[PublisherTarget["GitHub"] = 2] = "GitHub";
+    PublisherTarget[PublisherTarget["Polymart"] = 3] = "Polymart";
+    PublisherTarget[PublisherTarget["Hangar"] = 4] = "Hangar";
 })(PublisherTarget || (PublisherTarget = {}));
 (function (PublisherTarget) {
     function getValues() {
@@ -33191,8 +33193,8 @@ const defaults = {
     handlers: [],
     mutableDefaults: false,
 };
-const got = source_create(defaults);
-/* harmony default export */ const got_dist_source = (got);
+const source_got = source_create(defaults);
+/* harmony default export */ const got_dist_source = (source_got);
 
 
 
@@ -33454,6 +33456,7 @@ var ModLoaderType;
     ModLoaderType[ModLoaderType["Fabric"] = 1] = "Fabric";
     ModLoaderType[ModLoaderType["Forge"] = 2] = "Forge";
     ModLoaderType[ModLoaderType["Quilt"] = 3] = "Quilt";
+    ModLoaderType[ModLoaderType["Spigot"] = 4] = "Spigot";
 })(ModLoaderType || (ModLoaderType = {}));
 (function (ModLoaderType) {
     function getValues() {
@@ -33521,7 +33524,7 @@ class ModConfig {
 }
 
 ;// CONCATENATED MODULE: ./src/metadata/dependency-kind.ts
-var DependencyKind;
+var dependency_kind_DependencyKind;
 (function (DependencyKind) {
     DependencyKind[DependencyKind["Depends"] = 1] = "Depends";
     DependencyKind[DependencyKind["Recommends"] = 2] = "Recommends";
@@ -33529,7 +33532,7 @@ var DependencyKind;
     DependencyKind[DependencyKind["Suggests"] = 4] = "Suggests";
     DependencyKind[DependencyKind["Conflicts"] = 5] = "Conflicts";
     DependencyKind[DependencyKind["Breaks"] = 6] = "Breaks";
-})(DependencyKind || (DependencyKind = {}));
+})(dependency_kind_DependencyKind || (dependency_kind_DependencyKind = {}));
 (function (DependencyKind) {
     function getValues() {
         return Object.values(DependencyKind).filter(x => typeof x === "number");
@@ -33551,8 +33554,8 @@ var DependencyKind;
         return DependencyKind[target] ?? target.toString();
     }
     DependencyKind.toString = toString;
-})(DependencyKind || (DependencyKind = {}));
-/* harmony default export */ const dependency_kind = (DependencyKind);
+})(dependency_kind_DependencyKind || (dependency_kind_DependencyKind = {}));
+/* harmony default export */ const dependency_kind = (dependency_kind_DependencyKind);
 
 ;// CONCATENATED MODULE: ./src/metadata/mod-config-dependency.ts
 
@@ -33586,7 +33589,7 @@ class ModConfigDependency {
 
 ;// CONCATENATED MODULE: ./src/metadata/dependency.ts
 
-var Dependency;
+var dependency_Dependency;
 (function (Dependency) {
     function create({ id, version = "*", kind = dependency_kind.Depends, ignore = false, aliases = null }) {
         return {
@@ -33598,8 +33601,8 @@ var Dependency;
         };
     }
     Dependency.create = create;
-})(Dependency || (Dependency = {}));
-/* harmony default export */ const dependency = (Dependency);
+})(dependency_Dependency || (dependency_Dependency = {}));
+/* harmony default export */ const dependency = (dependency_Dependency);
 
 ;// CONCATENATED MODULE: ./src/metadata/fabric/fabric-mod-metadata.ts
 
@@ -33850,7 +33853,23 @@ class QuiltModMetadataReader extends ZippedModMetadataReader {
     }
 }
 
+;// CONCATENATED MODULE: ./src/metadata/spigot/spigot-plugin-metadata-reader.ts
+
+
+class SpigotPluginMetadataReader extends ZippedModMetadataReader {
+    constructor() {
+        super("plugin.yml");
+    }
+    loadConfig(buffer) {
+        return JSON.parse(buffer.toString("utf8"));
+    }
+    createMetadataFromConfig(config) {
+        return new FabricModMetadata(config);
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/metadata/mod-metadata-reader-factory.ts
+
 
 
 
@@ -33864,6 +33883,8 @@ class ModMetadataReaderFactory {
                 return new ForgeModMetadataReader();
             case mod_loader_type.Quilt:
                 return new QuiltModMetadataReader();
+            case mod_loader_type.Spigot:
+                return new SpigotPluginMetadataReader();
             default:
                 throw new Error(`Unknown mod/plugin loader "${mod_loader_type.toString(loaderType)}"`);
         }
@@ -34700,7 +34721,210 @@ class CurseForgePublisher extends ModPublisher {
     }
 }
 
+;// CONCATENATED MODULE: ./src/publishing/plugin-publisher.ts
+
+
+
+
+
+
+
+
+
+
+
+
+function plugin_publisher_processMultilineInput(input, splitter) {
+    if (!input) {
+        return [];
+    }
+    return (typeof input === "string" ? input.split(splitter || /(\r?\n)+/) : input).map(x => x.trim()).filter(x => x);
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function plugin_publisher_processDependenciesInput(input, inputSplitter, entrySplitter) {
+    return plugin_publisher_processMultilineInput(input, inputSplitter).map(x => {
+        const parts = x.split(entrySplitter || /\|/);
+        const id = parts[0].trim();
+        return Dependency.create({
+            id,
+            kind: parts[1] && DependencyKind.parse(parts[1].trim()) || DependencyKind.Depends,
+            version: parts[2]?.trim() || "*"
+        });
+    });
+}
+async function plugin_publisher_readChangelog(changelogPath) {
+    const file = (await File.getFiles(changelogPath))[0];
+    if (!file) {
+        throw new Error("Changelog file was not found");
+    }
+    return (await file.getBuffer()).toString("utf8");
+}
+class PluginPublisher extends Publisher {
+    get requiresId() {
+        return true;
+    }
+    get requiresModLoaders() {
+        return true;
+    }
+    get requiresGameVersions() {
+        return true;
+    }
+    async publish(files, options) {
+        this.validateOptions(options);
+        const releaseInfo = github.context.payload.release;
+        if (!Array.isArray(files) || !files.length) {
+            throw new Error("No upload files were specified");
+        }
+        const token = options.token;
+        if (!token) {
+            throw new Error(`Token is required to publish your assets to ${publisher_target.toString(this.target)}`);
+        }
+        const metadata = await mod_metadata_reader.readMetadata(files[0].path);
+        const id = options.id || metadata?.getProjectId(this.target);
+        if (!id && this.requiresId) {
+            throw new Error(`Resource id is required to publish your assets to ${publisher_target.toString(this.target)}`);
+        }
+        const filename = external_path_default().parse(files[0].path).name;
+        const version = (typeof options.version === "string" && options.version) || releaseInfo?.tag_name || metadata?.version || Version.fromName(filename);
+        const versionType = options.versionType?.toLowerCase() || version_type.fromName(metadata?.version || filename);
+        const name = typeof options.name === "string" ? options.name : (releaseInfo?.name || version);
+        const changelog = typeof options.changelog === "string"
+            ? options.changelog
+            : typeof options.changelogFile === "string"
+                ? await plugin_publisher_readChangelog(options.changelogFile)
+                : releaseInfo?.body || "";
+        const loaders = plugin_publisher_processMultilineInput(options.loaders, /\s+/);
+        if (!loaders.length && this.requiresModLoaders) {
+            if (metadata) {
+                loaders.push(...metadata.loaders);
+            }
+            if (!loaders.length) {
+                throw new Error("At least one mod loader should be specified");
+            }
+        }
+        const gameVersions = plugin_publisher_processMultilineInput(options.gameVersions);
+        if (!gameVersions.length && this.requiresGameVersions) {
+            const minecraftVersion = metadata?.dependencies.filter(x => x.id === "minecraft").map(x => parseVersionName(x.version))[0] ||
+                parseVersionNameFromFileVersion(version);
+            if (minecraftVersion) {
+                const resolver = options.versionResolver && MinecraftVersionResolver.byName(options.versionResolver) || MinecraftVersionResolver.releasesIfAny;
+                gameVersions.push(...(await resolver.resolve(minecraftVersion)).map(x => x.id));
+            }
+            if (!gameVersions.length) {
+                throw new Error("At least one game version should be specified");
+            }
+        }
+        const java = plugin_publisher_processMultilineInput(options.java);
+        await this.publishPlugin(id, token, name, version, versionType, loaders, gameVersions, java, changelog, files);
+    }
+}
+
+;// CONCATENATED MODULE: ./src/utils/polymart/index.ts
+
+
+
+const polymart_baseUrl = "https://api.polymart.org/v1/getResourceInfo?resource_id=2057";
+function polymart_createVersion(resourceId, data, files, token) {
+    data = {
+        ...data,
+        resource_id: resourceId,
+        api_key: token,
+        file_parts: files.map((_, i) => i.toString()),
+        beta: data.beta ? "1" : "0",
+        snapshot: data.snapshot ? "1" : "0"
+    };
+    const form = new (form_data_default())();
+    for (const [key, value] of Object.entries(data)) {
+        form.append(key, value);
+    }
+    for (let i = 0; i < files.length; ++i) {
+        const file = files[i];
+        form.append("file", file.getStream(), file.name);
+    }
+    const response = got_dist_source(`${polymart_baseUrl}/postUpdate`, {
+        method: "POST",
+        body: form
+    });
+    return polymart_processResponse(response, undefined, (x, msg) => new SoftError(x, `Failed to upload file: ${msg}`));
+}
+function getResource(resourceId) {
+    return polymart_processResponse(got.get(`${polymart_baseUrl}/getResourceInfo?resource_id=${resourceId}`), { 404: () => null });
+}
+function getResourceUpdates(resourceId) {
+    const response = got(`${polymart_baseUrl}/getResourceUpdates?resource_id=${resourceId}`);
+    return polymart_processResponse(response, { 404: () => [] });
+}
+async function polymart_processResponse(response, mappers, errorFactory) {
+    response = await response;
+    if (response.statusCode === 404) {
+        return mappers ? mappers[response.statusCode](response) : null;
+    }
+    if (!response.ok)
+        return mappers ? mappers[response.statusCode](response) : null;
+    const mapper = mappers?.[response.statusCode];
+    if (mapper) {
+        const mapped = await mapper(response);
+        if (mapped !== undefined) {
+            return mapped;
+        }
+    }
+    let errorText = response.statusMessage;
+    try {
+        errorText += `, ${response.body}`;
+    }
+    catch { }
+    errorText = `${response.statusCode} (${errorText})`;
+    const isSoftError = response.statusCode === 429 || response.statusCode >= 500;
+    if (errorFactory) {
+        throw errorFactory(isSoftError, errorText, response);
+    }
+    else if (isSoftError) {
+        throw new SoftError(isSoftError, errorText);
+    }
+    // TypeScript doesn't know the types of external API data that can change at any time.
+    const body = JSON.parse(response.body);
+    const { response: polyMartResponse } = body;
+    if (polyMartResponse.success) {
+        if (polyMartResponse.updates) {
+            return polyMartResponse?.updates;
+        }
+        if (polyMartResponse.resource) {
+            return polyMartResponse?.resource;
+        }
+        return polyMartResponse;
+    }
+}
+
+;// CONCATENATED MODULE: ./src/publishing/polymart/polymart-publisher.ts
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
+
+
+
+class PolymartPublisher extends PluginPublisher {
+    get target() {
+        return publisher_target.Polymart;
+    }
+    async publishPlugin(id, token, name, version, channel, loaders, gameVersions, java, changelog, files) {
+        const stopwatch = new LoggingStopwatch(this.logger, "🔃 Publishing to Polymart");
+        const data = {
+            title: name || version,
+            version_number: version,
+            message: changelog,
+            game_versions: gameVersions,
+            loaders,
+        };
+        // @ts-expect-error
+        data.beta = channel === "beta" ? "1" : "0";
+        // @ts-expect-error
+        data.snapshot = channel === "snapshot" ? "1" : "0";
+        await polymart_createVersion(id, data, files, token);
+        stopwatch.stop();
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/publishing/publisher-factory.ts
+
 
 
 
@@ -34714,6 +34938,10 @@ class PublisherFactory {
                 return new ModrinthPublisher(logger);
             case publisher_target.CurseForge:
                 return new CurseForgePublisher(logger);
+            case publisher_target.Polymart:
+                return new PolymartPublisher(logger);
+            // case PublisherTarget.Hangar:
+            //     return new CurseForgePublisher(logger);
             default:
                 throw new Error(`Unknown target "${publisher_target.toString(target)}"`);
         }
@@ -35189,7 +35417,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ // startup
 /******/ // Load entry module and return exports
 /******/ // This entry module doesn't tell about it's top-level declarations so it can't be inlined
-/******/ var __webpack_exports__ = __nccwpck_require__(55);
+/******/ var __webpack_exports__ = __nccwpck_require__(664);
 /******/ 
 
 //# sourceMappingURL=index.js.map
