@@ -60,11 +60,11 @@ export default abstract class PluginPublisher extends Publisher<PluginPublisherO
     }
 
     protected get requiresModLoaders(): boolean {
-        return true;
+        return false;
     }
 
     protected get requiresGameVersions(): boolean {
-        return true;
+        return false;
     }
 
     public async publish(files: File[], options: PluginPublisherOptions): Promise<void> {
