@@ -88,7 +88,7 @@ export default abstract class ModPublisher extends Publisher<ModPublisherOptions
 
         const filename = path.parse(files[0].path).name;
         const version = (typeof options.version === "string" && options.version) || <string>releaseInfo?.tag_name || metadata?.version || Version.fromName(filename);
-        const versionType = options.versionType?.toLowerCase() || VersionType.fromName(metadata?.version || filename);
+        const versionType = options.versionType ? options.versionType.toLowerCase().replace("master", "release") : VersionType.fromName(metadata?.version || filename);
         const name = typeof options.name === "string" ? options.name : (<string>releaseInfo?.name || version);
         const changelog = typeof options.changelog === "string"
             ? options.changelog
