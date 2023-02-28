@@ -33997,7 +33997,7 @@ class ModPublisher extends Publisher {
         }
         const filename = external_path_default().parse(files[0].path).name;
         const version = (typeof options.version === "string" && options.version) || releaseInfo?.tag_name || metadata?.version || Version.fromName(filename);
-        const versionType = options.versionType?.toLowerCase() || version_type.fromName(metadata?.version || filename);
+        const versionType = options.versionType ? options.versionType.toLowerCase().replace("master", "release") : version_type.fromName(metadata?.version || filename);
         const name = typeof options.name === "string" ? options.name : (releaseInfo?.name || version);
         const changelog = typeof options.changelog === "string"
             ? options.changelog
@@ -34764,10 +34764,10 @@ class PluginPublisher extends Publisher {
         return true;
     }
     get requiresModLoaders() {
-        return true;
+        return false;
     }
     get requiresGameVersions() {
-        return true;
+        return false;
     }
     async publish(files, options) {
         this.validateOptions(options);
@@ -34786,7 +34786,7 @@ class PluginPublisher extends Publisher {
         }
         const filename = external_path_default().parse(files[0].path).name;
         const version = (typeof options.version === "string" && options.version) || releaseInfo?.tag_name || metadata?.version || Version.fromName(filename);
-        const versionType = options.versionType?.toLowerCase() || version_type.fromName(metadata?.version || filename);
+        const versionType = options.versionType ? options.versionType.toLowerCase().replace("master", "release") : version_type.fromName(metadata?.version || filename);
         const name = typeof options.name === "string" ? options.name : (releaseInfo?.name || version);
         const changelog = typeof options.changelog === "string"
             ? options.changelog
@@ -34917,7 +34917,7 @@ class PolymartPublisher extends PluginPublisher {
         // @ts-expect-error
         data.beta = channel === "beta" ? "1" : "0";
         // @ts-expect-error
-        data.snapshot = channel === "snapshot" ? "1" : "0";
+        data.snapshot = channel === "alpha" ? "1" : "0";
         await polymart_createVersion(id, data, files, token);
         stopwatch.stop();
     }
