@@ -13,7 +13,7 @@ export default class PolymartPublisher extends PluginPublisher {
         const stopwatch = new LoggingStopwatch(this.logger, "🔃 Publishing to Polymart");
         const data = {
             title: name || version,
-            version_number: version,
+            version,
             message: changelog,
             // game_versions: gameVersions,
             // loaders,
