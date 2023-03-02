@@ -34903,7 +34903,6 @@ function polymart_createVersion(resourceId, data, files, token) {
         ...data,
         resource_id: resourceId,
         api_key: token,
-        file_parts: files.map((_, i) => i.toString()),
         beta: data.beta ? "1" : "0",
         snapshot: data.snapshot ? "1" : "0"
     };
