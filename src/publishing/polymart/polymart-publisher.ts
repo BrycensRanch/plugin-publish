@@ -15,8 +15,8 @@ export default class PolymartPublisher extends PluginPublisher {
             title: name || version,
             version_number: version,
             message: changelog,
-            game_versions: gameVersions,
-            loaders,
+            // game_versions: gameVersions,
+            // loaders,
         };
         // @ts-expect-error
         data.beta = channel === "beta" ? "1" : "0";
