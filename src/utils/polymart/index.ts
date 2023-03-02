@@ -73,7 +73,7 @@ export interface Update {
     url?:        string;
 }
 
-export function createVersion(resourceId: string, data: Record<string, any>, files: File[], token: string): Promise<Update> {
+export function createVersion(resourceId: string, data: Record<string, any>, file: File, token: string): Promise<Update> {
     data = {
         ...data,
         resource_id: resourceId,
@@ -86,10 +86,8 @@ export function createVersion(resourceId: string, data: Record<string, any>, fil
     for (const [key, value] of Object.entries(data)) {
         form.append(key, value);
     }
-    for (let i = 0; i < files.length; ++i) {
-        const file = files[i];
-        form.append("file", file.getStream(), file.name);
-    }
+    form.append("file", file.getStream(), file.name);
+
 
     const response = got(`${baseUrl}/postUpdate`, {
         method: "POST",

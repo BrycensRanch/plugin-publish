@@ -34898,7 +34898,7 @@ class PluginPublisher extends Publisher {
 
 
 const polymart_baseUrl = "https://api.polymart.org/v1/getResourceInfo?resource_id=2057";
-function polymart_createVersion(resourceId, data, files, token) {
+function polymart_createVersion(resourceId, data, file, token) {
     data = {
         ...data,
         resource_id: resourceId,
@@ -34910,10 +34910,7 @@ function polymart_createVersion(resourceId, data, files, token) {
     for (const [key, value] of Object.entries(data)) {
         form.append(key, value);
     }
-    for (let i = 0; i < files.length; ++i) {
-        const file = files[i];
-        form.append("file", file.getStream(), file.name);
-    }
+    form.append("file", file.getStream(), file.name);
     const response = got_dist_source(`${polymart_baseUrl}/postUpdate`, {
         method: "POST",
         body: form
@@ -34991,7 +34988,7 @@ class PolymartPublisher extends PluginPublisher {
         data.beta = channel === "beta" ? "1" : "0";
         // @ts-expect-error
         data.snapshot = channel === "alpha" ? "1" : "0";
-        await polymart_createVersion(id, data, files, token);
+        await polymart_createVersion(id, data, files[0], token);
         stopwatch.stop();
     }
 }
