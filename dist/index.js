@@ -34897,8 +34897,8 @@ class PluginPublisher extends Publisher {
 
 
 
-const polymart_baseUrl = "https://api.polymart.org/v1/getResourceInfo?resource_id=2057";
-function polymart_createVersion(resourceId, data, file, token) {
+const polymart_baseUrl = "https://api.polymart.org/v1";
+async function polymart_createVersion(resourceId, data, file, token) {
     data = {
         ...data,
         resource_id: resourceId,
@@ -34911,12 +34911,22 @@ function polymart_createVersion(resourceId, data, file, token) {
         form.append(key, value);
     }
     form.append("file", file.getStream(), file.name);
-    const response = got_dist_source(`${polymart_baseUrl}/postUpdate`, {
+    const response = await got_dist_source(`${polymart_baseUrl}/postUpdate`, {
         method: "POST",
         headers: form.getHeaders(),
         body: form
     });
-    return polymart_processResponse(response, undefined, (x, msg) => new SoftError(x, `Failed to upload file: ${msg}`));
+    if (response.statusCode === 200) {
+        // TypeScript doesn't know the types of external API data that can change at any time.
+        const body = JSON.parse(response.body);
+        const { response: polyMartResponse } = body;
+        if (polyMartResponse.success) {
+            return polyMartResponse.update;
+        }
+    }
+    else {
+        return polymart_processResponse(response);
+    }
 }
 function getResource(resourceId) {
     return polymart_processResponse(got.get(`${polymart_baseUrl}/getResourceInfo?resource_id=${resourceId}`), { 404: () => null });
@@ -34949,18 +34959,6 @@ async function polymart_processResponse(response, mappers, errorFactory) {
     }
     else if (isSoftError) {
         throw new SoftError(isSoftError, errorText);
-    }
-    // TypeScript doesn't know the types of external API data that can change at any time.
-    const body = JSON.parse(response.body);
-    const { response: polyMartResponse } = body;
-    if (polyMartResponse.success) {
-        if (polyMartResponse.updates) {
-            return polyMartResponse?.updates;
-        }
-        if (polyMartResponse.resource) {
-            return polyMartResponse?.resource;
-        }
-        return polyMartResponse;
     }
 }
 

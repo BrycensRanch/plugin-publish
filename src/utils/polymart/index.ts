@@ -3,7 +3,7 @@ import got, {CancelableRequest, Response} from "got"
 import File from "../io/file";
 import SoftError from "../soft-error";
 
-const baseUrl = "https://api.polymart.org/v1/getResourceInfo?resource_id=2057";
+const baseUrl = "https://api.polymart.org/v1";
 
 export interface Main {
     request:  Request;
@@ -20,6 +20,7 @@ export interface Request {
 export interface PolymartResponse {
     success:  boolean;
     errors:   any[];
+    update?: Update;
     updates?: Update[];
     resource?: Resource;
 }
@@ -73,7 +74,7 @@ export interface Update {
     url?:        string;
 }
 
-export function createVersion(resourceId: string, data: Record<string, any>, file: File, token: string): Promise<Update> {
+export async function createVersion(resourceId: string, data: Record<string, any>, file: File, token: string): Promise<Update> {
     data = {
         ...data,
         resource_id: resourceId,
@@ -89,13 +90,21 @@ export function createVersion(resourceId: string, data: Record<string, any>, fil
     form.append("file", file.getStream(), file.name);
 
 
-    const response = got(`${baseUrl}/postUpdate`, {
+    const response = await got(`${baseUrl}/postUpdate`, {
         method: "POST",
         headers: form.getHeaders(),
         body: form
     });
-
-    return processResponse(response, undefined, (x, msg) => new SoftError(x, `Failed to upload file: ${msg}`));
+    if (response.statusCode === 200) {
+            // TypeScript doesn't know the types of external API data that can change at any time.
+    const body: Main = JSON.parse(response.body as string);
+    const { response: polyMartResponse } = body;
+    if (polyMartResponse.success) {
+        return polyMartResponse.update as Update;
+    }
+    } else {
+        return processResponse(response);
+    }
 }
 
 export function getResource(resourceId: string): Promise<Resource> {
@@ -133,17 +142,5 @@ async function processResponse<T>(response: CancelableRequest<Response<string>> 
         throw errorFactory(isSoftError, errorText, response);
     } else if (isSoftError){
         throw new SoftError(isSoftError, errorText);
-    }
-    // TypeScript doesn't know the types of external API data that can change at any time.
-    const body: Main = JSON.parse(response.body as string);
-    const { response: polyMartResponse } = body;
-    if (polyMartResponse.success) {
-        if (polyMartResponse.updates) {
-            return polyMartResponse?.updates as T;
-        }
-        if (polyMartResponse.resource) {
-            return polyMartResponse?.resource as T;
-        }
-        return polyMartResponse as T;
     }
 }
