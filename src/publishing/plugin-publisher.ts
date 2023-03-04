@@ -11,7 +11,7 @@ import VersionType from "../utils/versioning/version-type";
 import DependencyKind from "../metadata/dependency-kind";
 import path from "path";
 
-interface ModPublisherOptions {
+interface PluginPublisherOptions {
     id: string;
     token: string;
     versionType?: "alpha" | "beta" | "release";
@@ -33,6 +33,7 @@ function processMultilineInput(input: string | string[], splitter?: RegExp): str
     return (typeof input === "string" ? input.split(splitter || /(\r?\n)+/) : input).map(x => x.trim()).filter(x => x);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function processDependenciesInput(input: string | string[], inputSplitter?: RegExp, entrySplitter?: RegExp): Dependency[] {
     return processMultilineInput(input, inputSplitter).map(x => {
         const parts = x.split(entrySplitter || /\|/);
@@ -53,20 +54,20 @@ async function readChangelog(changelogPath: string): Promise<string | never> {
     return (await file.getBuffer()).toString("utf8");
 }
 
-export default abstract class ModPublisher extends Publisher<ModPublisherOptions> {
+export default abstract class PluginPublisher extends Publisher<PluginPublisherOptions> {
     protected get requiresId(): boolean {
         return true;
     }
 
     protected get requiresModLoaders(): boolean {
-        return true;
+        return false;
     }
 
     protected get requiresGameVersions(): boolean {
-        return true;
+        return false;
     }
 
-    public async publish(files: File[], options: ModPublisherOptions): Promise<void> {
+    public async publish(files: File[], options: PluginPublisherOptions): Promise<void> {
         this.validateOptions(options);
         const releaseInfo = <any>context.payload.release;
 
@@ -83,7 +84,7 @@ export default abstract class ModPublisher extends Publisher<ModPublisherOptions
 
         const id = options.id || metadata?.getProjectId(this.target);
         if (!id && this.requiresId) {
-            throw new Error(`Project id is required to publish your assets to ${PublisherTarget.toString(this.target)}`);
+            throw new Error(`Resource id is required to publish your assets to ${PublisherTarget.toString(this.target)}`);
         }
 
         const filename = path.parse(files[0].path).name;
@@ -122,13 +123,9 @@ export default abstract class ModPublisher extends Publisher<ModPublisherOptions
         }
 
         const java = processMultilineInput(options.java);
-        const dependencies = typeof options.dependencies === "string"
-            ? processDependenciesInput(options.dependencies)
-            : metadata?.dependencies || [];
-        const uniqueDependencies = dependencies.filter((x, i, self) => !x.ignore && self.findIndex(y => y.id === x.id && y.kind === x.kind) === i);
 
-        await this.publishMod(id, token, name, version, versionType, loaders, gameVersions, java, changelog, files, uniqueDependencies, <Record<string, unknown>><unknown>options);
+        await this.publishPlugin(id, token, name, version, versionType, loaders, gameVersions, java, changelog, files);
     }
 
-    protected abstract publishMod(id: string, token: string, name: string, version: string, versionType: string, loaders: string[], gameVersions: string[], java: string[], changelog: string, files: File[], dependencies: Dependency[], options: Record<string, unknown>): Promise<void>;
+    protected abstract publishPlugin(id: string, token: string, name: string, version: string, versionType: string, loaders: string[], gameVersions: string[], java: string[], changelog: string, files: File[]): Promise<void>;
 }

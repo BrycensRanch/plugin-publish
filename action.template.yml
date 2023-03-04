@@ -11,7 +11,13 @@ inputs:
     publisher: true
   github:
     publisher: true
+  polymart:
+    publisher: true
 
+  polymart-id:
+    description: The ID of the Polymart project to upload to
+  polymart-token:
+    description: A valid token for the Polymart API
   modrinth-id:
     description: The ID of the Modrinth project to upload to
   modrinth-featured:

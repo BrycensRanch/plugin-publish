@@ -2,6 +2,9 @@ enum PublisherTarget {
     CurseForge,
     Modrinth,
     GitHub,
+    Polymart, 
+    Hangar
+
 }
 
 namespace PublisherTarget {

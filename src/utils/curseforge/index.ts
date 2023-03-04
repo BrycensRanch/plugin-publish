@@ -1,4 +1,4 @@
-import got from 'got';
+import got from "got";
 import FormData from "form-data";
 import File from "../io/file";
 import { findVersionByName } from "../minecraft";

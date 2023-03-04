@@ -5,6 +5,14 @@ branding:
   color: orange
   icon: upload
 inputs:
+  polymart-id:
+    description: The ID of the Polymart project to upload to
+    required: false
+    default: ${undefined}
+  polymart-token:
+    description: A valid token for the Polymart API
+    required: false
+    default: ${undefined}
   modrinth-id:
     description: The ID of the Modrinth project to upload to
     required: false
@@ -317,6 +325,70 @@ inputs:
     default: ${undefined}
     required: false
   github-fail-mode:
+    description: Determines how errors that occur during mod publishing process are handled
+    required: false
+    default: ${undefined}
+  polymart-files:
+    description: A glob of the files to upload
+    required: false
+    default: ${undefined}
+  polymart-files-primary:
+    description: A glob of the primary files to upload
+    required: false
+    default: ${undefined}
+  polymart-files-secondary:
+    description: A glob of the secondary files to upload
+    required: false
+    default: ${undefined}
+  polymart-name:
+    description: The name of the version
+    required: false
+    default: ${undefined}
+  polymart-version:
+    description: The version number
+    required: false
+    default: ${undefined}
+  polymart-version-type:
+    description: The type of the release - alpha, beta, or release
+    required: false
+    default: ${undefined}
+  polymart-changelog:
+    description: The changelog for this version
+    required: false
+    default: ${undefined}
+  polymart-changelog-file:
+    description: A glob of the changelog file
+    required: false
+    default: ${undefined}
+  polymart-loaders:
+    description: A list of supported mod loaders
+    required: false
+    default: ${undefined}
+  polymart-game-versions:
+    description: A list of supported Minecraft versions
+    required: false
+    default: ${undefined}
+  polymart-dependencies:
+    description: A list of dependencies
+    required: false
+    default: ${undefined}
+  polymart-version-resolver:
+    description: Determines the way automatic game-versions resolvement works
+    required: false
+    default: ${undefined}
+  polymart-java:
+    description: A list of supported Java versions
+    required: false
+    default: ${undefined}
+  polymart-retry-attempts:
+    description: The maximum number of attempts to publish assets
+    default: ${undefined}
+    required: false
+  polymart-retry-delay:
+    description: Time delay between attempts to publish assets (in milliseconds)
+    default: ${undefined}
+    required: false
+  polymart-fail-mode:
     description: Determines how errors that occur during mod publishing process are handled
     required: false
     default: ${undefined}
