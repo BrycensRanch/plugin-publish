@@ -91,7 +91,8 @@ export function createVersion(resourceId: string, data: Record<string, any>, fil
 
     const response = got(`${baseUrl}/postUpdate`, {
         method: "POST",
-        body: <any>form
+        headers: form.getHeaders(),
+        body: form
     });
 
     return processResponse(response, undefined, (x, msg) => new SoftError(x, `Failed to upload file: ${msg}`));
@@ -112,10 +113,7 @@ async function processResponse<T>(response: CancelableRequest<Response<string>> 
 
     if (response.statusCode === 404) {
         return mappers? mappers[response.statusCode](response) : null;
-    }
-    
-    if (!response.ok) return mappers? mappers[response.statusCode](response) : null;
-    
+    }    
 
     const mapper = mappers?.[response.statusCode];
     if (mapper) {

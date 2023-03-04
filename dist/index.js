@@ -34913,6 +34913,7 @@ function polymart_createVersion(resourceId, data, file, token) {
     form.append("file", file.getStream(), file.name);
     const response = got_dist_source(`${polymart_baseUrl}/postUpdate`, {
         method: "POST",
+        headers: form.getHeaders(),
         body: form
     });
     return polymart_processResponse(response, undefined, (x, msg) => new SoftError(x, `Failed to upload file: ${msg}`));
@@ -34929,8 +34930,6 @@ async function polymart_processResponse(response, mappers, errorFactory) {
     if (response.statusCode === 404) {
         return mappers ? mappers[response.statusCode](response) : null;
     }
-    if (!response.ok)
-        return mappers ? mappers[response.statusCode](response) : null;
     const mapper = mappers?.[response.statusCode];
     if (mapper) {
         const mapped = await mapper(response);
