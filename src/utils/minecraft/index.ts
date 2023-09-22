@@ -1,4 +1,4 @@
-import got from 'got'
+import got from "got";
 import Version from "../versioning/version";
 
 export enum MinecraftVersionType {

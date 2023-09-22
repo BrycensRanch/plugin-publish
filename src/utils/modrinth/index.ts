@@ -1,6 +1,6 @@
 import FormData from "form-data";
 // import fetch, { Response } from "node-fetch";
-import got, {CancelableRequest, Response} from 'got'
+import got, {CancelableRequest, Response} from "got"
 import { URLSearchParams } from "url";
 import File from "../io/file";
 import SoftError from "../soft-error";
@@ -48,7 +48,9 @@ export function createVersion(modId: string, data: Record<string, any>, files: F
 }
 
 export function getProject(idOrSlug: string): Promise<ModrinthProject> {
-    return processResponse(got.get(`${baseUrl}/project/${idOrSlug}`), { 404: () => <ModrinthProject>null });
+    return processResponse(got.get(`${baseUrl}/project/${idOrSlug}`, {
+        throwHttpErrors: false
+    }), { 404: () => <ModrinthProject>null });
 }
 
 export function getVersions(idOrSlug: string, loaders?: string[], gameVersions?: string[], featured?: boolean, token?: string): Promise<ModrinthVersion[]> {
@@ -64,7 +66,8 @@ export function getVersions(idOrSlug: string, loaders?: string[], gameVersions?:
     }
 
     const response = got(`${baseUrl}/project/${idOrSlug}/version?${urlParams}`, token ? {
-        headers: { Authorization: token }
+        headers: { Authorization: token },
+        throwHttpErrors: false
     } : undefined);
     return processResponse(response, { 404: () => <ModrinthVersion[]>[] });
 }
@@ -76,7 +79,7 @@ export async function modifyVersion(id: string, version: Partial<ModrinthVersion
             "Authorization": token,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(version)
+        body: JSON.stringify(version),
     });
 
     return response.ok;
@@ -90,8 +93,7 @@ async function processResponse<T>(response: CancelableRequest<Response<string>> 
     }
     
     if (response.ok) { 
-        // @ts-expect-error
-        return JSON.parse(response.body);
+        return JSON.parse(response.body as string);
     }
 
     const mapper = mappers?.[(await response).statusCode];

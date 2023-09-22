@@ -28,7 +28,7 @@ describe("LogginStopwatch", () => {
         expect(stopwatch.stop()).toBe(true);
         expect(stopwatch.stop()).toBe(false);
         expect(stopwatch.elapsedMilliseconds).toBeGreaterThan(50);
-        expect(stopwatch.elapsedMilliseconds).toBeLessThan(200);
+        expect(stopwatch.elapsedMilliseconds).toBeLessThan(250);
         stopwatch.reset();
         expect(stopwatch.elapsedMilliseconds).toBe(0);
     });

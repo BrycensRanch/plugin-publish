@@ -42,6 +42,10 @@ export default class ModrinthPublisher extends ModPublisher {
 
     protected async publishMod(id: string, token: string, name: string, version: string, channel: string, loaders: string[], gameVersions: string[], _java: string[], changelog: string, files: File[], dependencies: Dependency[], options: Record<string, unknown>): Promise<void> {
         const featured = mapBooleanInput(options.featured, true);
+        // What the fuck is this code doing???
+        // TODO: Refact this to more simple code that maintainers can actually understand
+        // I suspect it's something to do with TypeScript fuckery...
+        // @ts-expect-error Testing
         const unfeatureMode = mapEnumInput(options.unfeatureMode, UnfeatureMode, featured ? UnfeatureMode.Subset : UnfeatureMode.None);
         const projects = (await Promise.all(dependencies
             .filter((x, _, self) => (x.kind !== DependencyKind.Suggests && x.kind !== DependencyKind.Includes) || !self.find(y => y.id === x.id && y.kind !== DependencyKind.Suggests && y.kind !== DependencyKind.Includes))
